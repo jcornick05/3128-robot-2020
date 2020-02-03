@@ -1,8 +1,5 @@
 package org.team3128.athos.main;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-
 import org.team3128.common.generics.RobotConstants;
 
 import org.team3128.common.NarwhalRobot;
@@ -49,6 +46,7 @@ import java.util.ArrayList;
 import java.util.concurrent.*;
 
 import org.team3128.common.generics.ThreadScheduler;
+import org.team3128.athos.main.CMDAlignToBall;
 
 public class MainAthos extends NarwhalRobot {
     NEODrive drive = NEODrive.getInstance();
@@ -77,6 +75,9 @@ public class MainAthos extends NarwhalRobot {
 
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
+
+    public Limelight limelight = new Limelight("limelight", 26 * Angle.DEGREES, 6.15 * Length.in, 0 * Length.in,
+            14.5 * Length.in);
 
     @Override
     protected void constructHardware() {
@@ -152,6 +153,8 @@ public class MainAthos extends NarwhalRobot {
         lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignToTarget");
         lm.addButtonDownListener("AlignToTarget", () -> {
             // TODO: Add current implementation of vision alignment
+            //CMDAlignToBall alignCommand = new CMDAlignToBall(gyro, limelight, visionPID, blindPID);
+            
             Log.info("MainAthos.java", "[Vision Alignment] Not created yet, would've started");
         });
         lm.addButtonUpListener("AlignToTarget", () -> {
@@ -163,6 +166,7 @@ public class MainAthos extends NarwhalRobot {
         });
         lm.addButtonDownListener("PrintCSV", () -> {
             Log.info("MainAthos", trackerCSV);
+
         });
         lm.addButtonDownListener("ClearCSV", () -> {
             trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";

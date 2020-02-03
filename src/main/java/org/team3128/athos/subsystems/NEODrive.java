@@ -41,7 +41,7 @@ public class NEODrive extends Threaded {
 		TELEOP, RAMSETECONTROL, TURN, DONE
 	}
 
-	private static final NEODrive instance = new NEODrive();
+	public static final NEODrive instance = new NEODrive();
 
 	public static NEODrive getInstance() {
 		return instance;
@@ -126,7 +126,7 @@ public class NEODrive extends Threaded {
 		setWheelVelocity(new DriveSignal(40, 0));
 	}
 
-	private void configAuto() {
+	public void configAuto() {
 		rightSparkPID.setP(Constants.K_AUTO_RIGHT_P, 0);
 		rightSparkPID.setD(Constants.K_AUTO_RIGHT_D, 0);
 		rightSparkPID.setFF(Constants.K_AUTO_RIGHT_F, 0);
@@ -139,7 +139,7 @@ public class NEODrive extends Threaded {
 
 	}
 
-	private void configHigh() {
+	public void configHigh() {
 		driveMultiplier = Constants.DRIVE_HIGH_SPEED;
 	}
 
@@ -157,7 +157,7 @@ public class NEODrive extends Threaded {
 		System.out.println(leftSpark);
 	}
 
-	private void configMotors() {
+	public void configMotors() {
 		leftSparkSlave.follow(leftSpark);
 		// leftSparkSlave2.follow(leftSpark);
 		rightSparkSlave.follow(rightSpark);
@@ -355,7 +355,7 @@ public class NEODrive extends Threaded {
 				+ kD + ", kF = " + kF);
 	}
 
-	private void updateTurn() {
+	public void updateTurn() {
 		double error = wantedHeading.rotateBy(RobotTracker.getInstance().getOdometry().rotationMat.inverse())
 				.getDegrees();
 		double deltaSpeed;

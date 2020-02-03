@@ -1,5 +1,6 @@
 package org.team3128.common.vision;
 
+import org.team3128.athos.subsystems.NEODrive;
 import org.team3128.common.drive.DriveCommandRunning;
 import org.team3128.common.drive.SRXTankDrive;
 import org.team3128.common.drive.calibrationutility.DriveCalibrationUtility;
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class CmdHorizontalOffsetFeedbackDrive extends Command {
-    SRXTankDrive drive;
+    NEODrive drive;
     Gyro gyro;
 
     DriveCalibrationUtility dcu;
@@ -67,7 +68,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
     }
 
     private HorizontalOffsetFeedbackDriveState aimState = HorizontalOffsetFeedbackDriveState.SEARCHING;
-
+//add to CMDAlignToBall
     public CmdHorizontalOffsetFeedbackDrive(Gyro gyro, Limelight txLimelight, Limelight distanceLimelight,
             DriveCommandRunning cmdRunning, double targetHeight, PIDConstants visionPID, double goalHorizontalOffset,
             double decelerationStartDistance, double decelerationEndDistance, PIDConstants blindPID,
@@ -93,7 +94,8 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
         this.isLowHatch = isLowHatch;
     }
 
-    @Override
+
+	@Override
     protected void initialize() {
         drive = SRXTankDrive.getInstance();
         dcu = DriveCalibrationUtility.getInstance();
