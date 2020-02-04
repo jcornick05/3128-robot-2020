@@ -2,6 +2,10 @@
 
 package org.team3128.aramis.main;
 
+
+import org.team3128.common.utility.*;
+
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,6 +17,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import org.team3128.common.hardware.motor.*;
 
 import org.team3128.common.NarwhalRobot;
 import org.team3128.common.drive.DriveCommandRunning;
@@ -34,6 +40,7 @@ import org.team3128.common.listener.controltypes.Button;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,11 +55,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 
+import org.team3128.common.utility.test_suite.*;
+
 public class MainAramis extends NarwhalRobot {
-    public TalonSRX rightDriveLeader;
+    public LazyTalonSRX rightDriveLeader;
     public VictorSPX rightDriveFollower;
-    public TalonSRX leftDriveLeader;
+    public LazyTalonSRX leftDriveLeader;
     public VictorSPX leftDriveFollower;
+    public PowerDistributionPanel pdp;
 
     public SRXTankDrive tankDrive;
 
@@ -91,6 +101,18 @@ public class MainAramis extends NarwhalRobot {
     File usbFile;
     String csvString = "";
 
+
+    public ErrorCatcherUtility errorCatcher;
+    public static CanDevices[] CanChain = new CanDevices[42];
+    public static void setCanChain(){
+        CanChain[0] = Constants.leftDriveLeader;
+        CanChain[1] = Constants.leftDriveFollower;
+        CanChain[2] = Constants.rightDriveLeader;
+        CanChain[3] = Constants.rightDriveFollower;
+        CanChain[4] = Constants.PDP;
+    }
+
+
     @Override
     protected void constructHardware() {
         try {
@@ -122,14 +144,18 @@ public class MainAramis extends NarwhalRobot {
             ioe.printStackTrace();
         }
 
+        
+
         limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-        rightDriveLeader = new TalonSRX(10);
-        rightDriveFollower = new VictorSPX(11);
+        rightDriveLeader = new LazyTalonSRX(15);
+        rightDriveFollower = new VictorSPX(6);
 
-        leftDriveLeader = new TalonSRX(15);
-        leftDriveFollower = new VictorSPX(16);
+        leftDriveLeader = new LazyTalonSRX(13);
+        leftDriveFollower = new VictorSPX(5);
 
+        pdp = new PowerDistributionPanel(0);
+        
         rightDriveLeader.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0,
                 Constants.CAN_TIMEOUT);
         rightDriveFollower.set(ControlMode.Follower, rightDriveLeader.getDeviceID());
@@ -143,8 +169,7 @@ public class MainAramis extends NarwhalRobot {
         double wheelBase = 32.3 * Length.in;
         int robotFreeSpeed = 3700;
 
-        // SRXTankDrive.initialize(leftDriveLeader, rightDriveLeader, wheelCirc,
-        // wheelBase, robotFreeSpeed);
+        SRXTankDrive.initialize(leftDriveLeader, rightDriveLeader, wheelCirc, wheelBase, robotFreeSpeed);
 
         leftDriveLeader.setInverted(false);
         leftDriveFollower.setInverted(false);
@@ -175,11 +200,25 @@ public class MainAramis extends NarwhalRobot {
         blindPID = new PIDConstants(0.1, 0, 0, 0);
         driveCmdRunning = new DriveCommandRunning();
 
+        //Error Catcher (Auto Test Suite)
+        Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 13, "Left Drive Leader", leftDriveLeader, null, null, null, null);
+        Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 5, "Left Drive Follower", null, leftDriveFollower, null, null, null);
+        Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 15, "Right Drive Leader", rightDriveLeader, null, null, null, null);
+        Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 6, "Right Drive Follower", null, rightDriveFollower, null, null, null);
+        Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
+        //errorCatcher = new ErrorCatcherUtility(CanChain);
+        setCanChain();
+
         // DCU
         // DriveCalibrationUtility.initialize(gyro, visionPID);
-        dcu = DriveCalibrationUtility.getInstance();
+        //dcu = DriveCalibrationUtility.getInstance();
 
-        dcu.initNarwhalDashboard();
+        //dcu.initNarwhalDashboard();
+        NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
+            if (down) {
+                //errorCatcher.ErrorCatcher();
+            }
+        });
     }
 
     @Override
@@ -340,7 +379,7 @@ public class MainAramis extends NarwhalRobot {
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
-        dcu.tickNarwhalDashboard();
+        //dcu.tickNarwhalDashboard();
 
         if (SmartDashboard.getBoolean("gettingData", false)) {
             csvString += (Long.toString(RobotController.getFPGATime()) + limelight.getValues(5).toString() + "\n");

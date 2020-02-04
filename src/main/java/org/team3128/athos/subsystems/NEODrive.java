@@ -34,8 +34,9 @@ import org.team3128.common.utility.RobotMath;
 import edu.wpi.first.wpilibj.Timer;
 
 import org.team3128.common.utility.Log;
+import org.team3128.common.drive.Drive;
 
-public class NEODrive extends Threaded {
+public class NEODrive extends Drive {
 
 	public enum DriveState {
 		TELEOP, RAMSETECONTROL, TURN, DONE
@@ -48,8 +49,6 @@ public class NEODrive extends Threaded {
 	}
 
 	private ADXRS450_Gyro gyroSensor;
-	// private LazyTalonSRX leftTalon, rightTalon, leftSlaveTalon, leftSlave2Talon,
-	// rightSlaveTalon, rightSlave2Talon;
 	private RamseteController autonomousDriver;
 	private Trajectory trajectory = null;
 	private AsynchronousPid turnPID;
@@ -65,7 +64,7 @@ public class NEODrive extends Threaded {
 	double prevPositionL = 0;
 	double prevPositionR = 0;
 
-	public LazyCANSparkMax leftSpark, rightSpark, leftSparkSlave, rightSparkSlave, leftSparkSlave2, rightSparkSlave2;
+	public static LazyCANSparkMax leftSpark, rightSpark, leftSparkSlave, rightSparkSlave, leftSparkSlave2, rightSparkSlave2;
 	private CANPIDController leftSparkPID, rightSparkPID;
 	private CANEncoder leftSparkEncoder, rightSparkEncoder;
 
@@ -83,10 +82,10 @@ public class NEODrive extends Threaded {
 		// rightSparkSlave2 = new LazyCANSparkMax(Constants.RIGHT_DRIVE_BACK_ID,
 		// MotorType.kBrushless);
 
-		leftSpark.setInverted(false);
-		rightSpark.setInverted(true);
-		leftSparkSlave.setInverted(false);
-		rightSparkSlave.setInverted(true);
+		leftSpark.setInverted(true);
+		rightSpark.setInverted(false);
+		leftSparkSlave.setInverted(true);
+		rightSparkSlave.setInverted(false);
 		// leftSparkSlave2.setInverted(false);
 		// rightSparkSlave2.setInverted(false);
 
@@ -110,23 +109,23 @@ public class NEODrive extends Threaded {
 		configAuto();
 	}
 
-	public void debug() {
+	@Override public void debug() {
 		System.out.println("L enc: " + getLeftDistance() + " velo " + getLeftSpeed());
 		System.out.println("R enc: " + getRightDistance() + " velo " + getRightSpeed());
 		System.out.println("Gyro: " + getAngle()/* getGyroAngle().getDegrees() */);
 	}
 
-	public void debugSpeed() {
+	@Override public void debugSpeed() {
 		System.out.println("L speed " + " actual " + getLeftSpeed());
 		System.out.println("R speed " + " actual " + getRightSpeed());
 
 	}
 
-	public void setRight() {
+	@Override public void setRight() {
 		setWheelVelocity(new DriveSignal(40, 0));
 	}
 
-	public void configAuto() {
+	@Override public void configAuto() {
 		rightSparkPID.setP(Constants.K_AUTO_RIGHT_P, 0);
 		rightSparkPID.setD(Constants.K_AUTO_RIGHT_D, 0);
 		rightSparkPID.setFF(Constants.K_AUTO_RIGHT_F, 0);
@@ -139,7 +138,7 @@ public class NEODrive extends Threaded {
 
 	}
 
-	public void configHigh() {
+	@Override public void configHigh() {
 		driveMultiplier = Constants.DRIVE_HIGH_SPEED;
 	}
 
@@ -149,15 +148,15 @@ public class NEODrive extends Threaded {
 		driveState = DriveState.TELEOP;
 	}
 
-	public void calibrateGyro() {
+	@Override public void calibrateGyro() {
 		gyroSensor.calibrate();
 	}
 
-	public void printCurrent() {
+	@Override public void printCurrent() {
 		System.out.println(leftSpark);
 	}
 
-	public void configMotors() {
+	@Override public void configMotors() {
 		leftSparkSlave.follow(leftSpark);
 		// leftSparkSlave2.follow(leftSpark);
 		rightSparkSlave.follow(rightSpark);
@@ -172,24 +171,24 @@ public class NEODrive extends Threaded {
 		configAuto();
 	}
 
-	public void resetMotionProfile() {
+	@Override public void resetMotionProfile() {
 		moveProfiler.reset();
 	}
 
-	public double getAngle() {
+	@Override public double getAngle() {
 		return -gyroSensor.getAngle();
 	}
 
-	public double getDistance() {
+	@Override public double getDistance() {
 		return (getLeftDistance() + getRightDistance()) / 2;
 	}
 
-	public Rotation2D getGyroAngle() {
+	@Override public Rotation2D getGyroAngle() {
 		// -180 through 180
 		return Rotation2D.fromDegrees(gyroSensor.getAngle());
 	}
 
-	public double getLeftDistance() {
+	@Override public double getLeftDistance() {
 		/*
 		 * return leftTalon.getSelectedSensorPosition(0) /
 		 * Constants.EncoderTicksPerRotation * Constants.WheelDiameter Math.PI * 22d /
@@ -199,30 +198,30 @@ public class NEODrive extends Threaded {
 				* Constants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION;
 	}
 
-	public double getRightDistance() {
+	@Override public double getRightDistance() {
 		return rightSparkEncoder.getPosition() * Constants.WHEEL_DIAMETER * Math.PI
 				* Constants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION;
 	}
 
-	public double getSpeed() {
+	@Override public double getSpeed() {
 		return (getLeftSpeed() + getRightSpeed()) / 2;
 	}
 
-	public double getLeftSpeed() {
+	@Override public double getLeftSpeed() {
 		return leftSparkEncoder.getVelocity() * Constants.kDriveInchesPerSecPerRPM;
 	}
 
-	public double getRightSpeed() {
+	@Override public double getRightSpeed() {
 		return rightSparkEncoder.getVelocity() * Constants.kDriveInchesPerSecPerRPM;
 	}
 
-	public synchronized void setAutoTrajectory(Trajectory autoTraj, boolean isReversed) {
+	@Override public synchronized void setAutoTrajectory(Trajectory autoTraj, boolean isReversed) {
 		this.trajectory = autoTraj;
 		totalTime = trajectory.getTotalTimeSeconds();
 		autonomousDriver = new RamseteController(1.8, 0.7, isReversed, Constants.TRACK_RADIUS); // 2,0.7
 	}
 
-	public synchronized void startTrajectory() {
+	@Override public synchronized void startTrajectory() {
 		if (trajectory == null) {
 			Log.info("NEODrive", "FATAL // FAILED TRAJECTORY - NULL TRAJECTORY INPUTTED");
 			Log.info("NEODrive", "Returned to teleop control");
@@ -234,19 +233,19 @@ public class NEODrive extends Threaded {
 		}
 	}
 
-	public void setBrakeState(NeutralMode mode) {
+	@Override public void setBrakeState(NeutralMode mode) {
 	}
 
-	public double getVoltage() {
+	@Override public double getVoltage() {
 		return 0;
 	}
 
-	private void setWheelPower(DriveSignal setVelocity) {
+	public void setWheelPower(DriveSignal setVelocity) {
 		leftSpark.set(setVelocity.leftVelocity);
 		rightSpark.set(setVelocity.rightVelocity);
 	}
 
-	private void setWheelVelocity(DriveSignal setVelocity) {
+	public void setWheelVelocity(DriveSignal setVelocity) {
 		if (Math.abs(setVelocity.rightVelocity) > (Constants.DRIVE_HIGH_SPEED)
 				|| Math.abs(setVelocity.leftVelocity) > (Constants.DRIVE_HIGH_SPEED)) {
 			DriverStation.getInstance();
@@ -272,7 +271,7 @@ public class NEODrive extends Threaded {
 	 * @param throttle throttle control input scaled between 1 and -1 (-.8 is 10 %,
 	 *                 0 is 50%, 1.0 is 100%)
 	 */
-	public void arcadeDrive(double joyX, double joyY, double throttle, boolean fullSpeed) {
+	@Override public void arcadeDrive(double joyX, double joyY, double throttle, boolean fullSpeed) {
 		synchronized (this) {
 			driveState = DriveState.TELEOP;
 		}
@@ -309,8 +308,8 @@ public class NEODrive extends Threaded {
 		setWheelVelocity(new DriveSignal(spdL, spdR));
 	}
 
-	@Override
-	public void update() {
+
+	@Override public void update() {
 		// System.out.println("L speed " + getLeftSpeed() + " position x " +
 		// RobotTracker.getInstance().getOdometry().translationMat.getX());
 		// System.out.println("R speed " + getRightSpeed() + " position y " +
@@ -332,7 +331,7 @@ public class NEODrive extends Threaded {
 		}
 	}
 
-	public void setRotation(Rotation2D angle) {
+	@Override public void setRotation(Rotation2D angle) {
 		synchronized (this) {
 			wantedHeading = angle;
 			driveState = DriveState.TURN;
@@ -343,7 +342,7 @@ public class NEODrive extends Threaded {
 	/**
 	 * Set Velocity PID for both sides of the drivetrain (to the same constants)
 	 */
-	public void setDualVelocityPID(double kP, double kD, double kF) {
+	@Override public void setDualVelocityPID(double kP, double kD, double kF) {
 		leftSparkPID.setP(kP);
 		leftSparkPID.setD(kD);
 		leftSparkPID.setFF(kF);
@@ -355,7 +354,7 @@ public class NEODrive extends Threaded {
 				+ kD + ", kF = " + kF);
 	}
 
-	public void updateTurn() {
+	@Override public void updateTurn() {
 		double error = wantedHeading.rotateBy(RobotTracker.getInstance().getOdometry().rotationMat.inverse())
 				.getDegrees();
 		double deltaSpeed;
@@ -375,11 +374,11 @@ public class NEODrive extends Threaded {
 		}
 	}
 
-	public void setShiftState(boolean state) {
+	@Override public void setShiftState(boolean state) {
 		configHigh();
 	}
 
-	private void updateRamseteController(boolean isStart) {
+	@Override public void updateRamseteController(boolean isStart) {
 		currentTime = Timer.getFPGATimestamp();
 		if (isStart) {
 			startTime = currentTime;
@@ -400,16 +399,16 @@ public class NEODrive extends Threaded {
 		setWheelVelocity(signal.command);
 	}
 
-	public void resetGyro() {
+	@Override public void resetGyro() {
 		gyroSensor.reset();
 	}
 
-	public boolean checkSubsystem() {
+	@Override public boolean checkSubsystem() {
 		configMotors();
 		return true;
 	}
 
-	synchronized public void stopMovement() {
+	@Override synchronized public void stopMovement() {
 		leftSpark.set(0);
 		rightSpark.set(0);
 		leftSparkPID.setReference(0, ControlType.kDutyCycle);
@@ -420,10 +419,10 @@ public class NEODrive extends Threaded {
 		resetMotionProfile();
 	}
 
-	synchronized public boolean isFinished() {
+	@Override synchronized public boolean isFinished() {
 		return driveState == DriveState.DONE || driveState == DriveState.TELEOP;
 	}
 
-	public void clearStickyFaults() {
+	@Override public void clearStickyFaults() {
 	}
 }

@@ -1,4 +1,4 @@
-package org.team3128.athos.subsystems;
+package org.team3128.testbench.subsystems;
 
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.utility.units.Angle;
@@ -8,8 +8,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.team3128.common.generics.RobotConstants;
 
-import org.team3128.common.hardware.motor.LazyCANSparkMax;
-import org.team3128.common.utility.test_suite.*;
 // the superclass is purely for semantic purposes
 public class Constants extends RobotConstants {
 
@@ -35,15 +33,14 @@ public class Constants extends RobotConstants {
         public static final double WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION = 1
                         / Constants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION;
 
-        public static final int RIGHT_DRIVE_FRONT_ID = 1;
+        public static final int RIGHT_DRIVE_FRONT_ID = 5;
         public static final int RIGHT_DRIVE_MIDDLE_ID = 2;
-        public static final int RIGHT_DRIVE_BACK_ID = 5;
+        public static final int RIGHT_DRIVE_BACK_ID = 0;
 
-        public static final int LEFT_DRIVE_FRONT_ID = 3;
-        public static final int LEFT_DRIVE_MIDDLE_ID = 4;
-        public static final int LEFT_DRIVE_BACK_ID = 6;
+        public static final int LEFT_DRIVE_FRONT_ID = 11;
+        public static final int LEFT_DRIVE_MIDDLE_ID = 5;
+        public static final int LEFT_DRIVE_BACK_ID = 3;
 
-        public static final double TEST_SUITE_DRIVE_VELOCITY = 20; //power
         // public static final double WHEELBASE = 32.3; // Might be deprecated. I have to find out how to implement arc
                                                      // turns
                                                      // first. (Adham)
@@ -107,8 +104,5 @@ public class Constants extends RobotConstants {
         public static final double BOTTOM_LIMELIGHT_HEIGHT = 6.15 * Length.in;
         public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
         public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 0 * Length.in;
-
-        public static CanDevices leftDriveLeader, rightDriveLeader, leftDriveFollower, rightDriveFollower;
-        public static CanDevices PDP;
 
 }
