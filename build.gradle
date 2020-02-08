@@ -8,7 +8,7 @@ targetCompatibility = JavaVersion.VERSION_11
 
 //def ROBOT_MAIN_CLASS = "org.team3128.aramis.main.MainAramis"
 //def ROBOT_MAIN_CLASS = "org.team3128.compbot.main.MainCompbot"
-def ROBOT_MAIN_CLASS = "org.team3128.testbench.main.MainTestbench"
+def ROBOT_MAIN_CLASS = "org.team3128.testbench.main.MainTestBench"
 //def ROBOT_MAIN_CLASS = "org.team3128.athos.main.MainAthos"
 
 

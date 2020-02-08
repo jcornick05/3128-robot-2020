@@ -41,9 +41,10 @@ public class Constants extends RobotConstants {
         public static final int LEFT_DRIVE_MIDDLE_ID = 5;
         public static final int LEFT_DRIVE_BACK_ID = 3;
 
-        // public static final double WHEELBASE = 32.3; // Might be deprecated. I have to find out how to implement arc
-                                                     // turns
-                                                     // first. (Adham)
+        // public static final double WHEELBASE = 32.3; // Might be deprecated. I have
+        // to find out how to implement arc
+        // turns
+        // first. (Adham)
         public static final int DRIVE_HIGH_SPEED = 140; // Empirical Max Linear Speed: 146.57 in/s
         // public static final double WHEEL_CIRCUMFERENCE = 13.21; // Might be
         // deprecated. I am thinking of switching to
@@ -104,5 +105,11 @@ public class Constants extends RobotConstants {
         public static final double BOTTOM_LIMELIGHT_HEIGHT = 6.15 * Length.in;
         public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
         public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 0 * Length.in;
+
+        // ---- SHOOTER
+        public static final int SHOOTER_MOTOR_LEFT_ID = 5;
+        public static final int SHOOTER_MOTOR_RIGHT_ID = 11;
+        public static final double K_SHOOTER_P = 0.0004;
+        public static final double K_SHOOTER_D = 0.000008;
 
 }
